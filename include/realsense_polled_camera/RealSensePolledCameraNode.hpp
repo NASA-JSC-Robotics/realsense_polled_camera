@@ -11,7 +11,7 @@
 #include <opencv2/opencv.hpp>
 #include <pcl_conversions/pcl_conversions.h>
 
-#include <tf2_ros/static_transform_broadcaster.hpp>
+// #include <tf2_ros/static_transform_broadcaster.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <sensor_msgs/msg/image.h>
@@ -60,7 +60,7 @@ class RealSensePolledCameraNode : public rclcpp::Node
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr m_pointCloudPubPtr;
     rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr m_triggerServer;
 
-    std::shared_ptr<tf2_ros::StaticTransformBroadcaster> m_staticTfBroadcaster;
+    // std::shared_ptr<tf2_ros::StaticTransformBroadcaster> m_staticTfBroadcaster;
     
 
     void initialize();
@@ -76,7 +76,7 @@ class RealSensePolledCameraNode : public rclcpp::Node
     // camera setup functions
     void getDevice(rs2::device_list list);
 
-    void publishTfFrames();
+    // void publishTfFrames();
 
     // utilities
     bool getParamsFromStreamProfile(std::string profileStrA, int32_t& widthA, int32_t& heightA, int32_t& fpsA);

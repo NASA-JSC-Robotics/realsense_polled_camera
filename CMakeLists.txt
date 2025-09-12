@@ -21,8 +21,7 @@ find_package(cv_bridge REQUIRED)
 find_package(image_geometry REQUIRED)
 find_package(pcl_ros REQUIRED)
 find_package(pcl_conversions REQUIRED)
-
-
+# find_package(tf2_ros REQUIRED)
 
 
 ########################## OpenCV ###################################
@@ -51,6 +50,7 @@ ament_target_dependencies(realsense_polled_camera_component
                                       image_geometry
                                       pcl_conversions
                                       pcl_ros
+                                      # tf2_ros
 )
 target_link_libraries(realsense_polled_camera_component ${OPENCV_LIBS} ${realsense2_LIBRARY} Boost::date_time)
 
@@ -72,12 +72,6 @@ install(TARGETS realsense_polled_camera_component
 install(DIRECTORY
               launch
               DESTINATION share/${PROJECT_NAME}/)
-
-install(DIRECTORY
-              config
-              DESTINATION share/${PROJECT_NAME}/)
-
-
 
 ament_environment_hooks(${ament_cmake_package_templates_ENVIRONMENT_HOOK_LIBRARY_PATH})              
 

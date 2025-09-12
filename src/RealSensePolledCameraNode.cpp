@@ -81,10 +81,10 @@ void RealSensePolledCameraNode::initialize()
         m_pointCloudPubPtr = this->create_publisher<sensor_msgs::msg::PointCloud2>("~/pointcloud", 1);
     }
 
-    if(get_parameter("publish_tf").as_bool())
-    {
-        m_staticTfBroadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
-    }
+    // if(get_parameter("publish_tf").as_bool())
+    // {
+    //     m_staticTfBroadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+    // }
     m_triggerServer = this->create_service<std_srvs::srv::Trigger>(
         "~/request_images",
         std::bind(&RealSensePolledCameraNode::pollService, this, std::placeholders::_1, std::placeholders::_2));
@@ -159,10 +159,10 @@ void RealSensePolledCameraNode::initializeCamera()
         m_alignPtr = std::make_shared<rs2::align>(RS2_STREAM_COLOR);
     }
 
-    if(get_parameter("publish_tf").as_bool())
-    {
-        publishTfFrames();
-    }
+    // if(get_parameter("publish_tf").as_bool())
+    // {
+    //     publishTfFrames();
+    // }
 }
 
 void RealSensePolledCameraNode::pollService(const std::shared_ptr<std_srvs::srv::Trigger::Request>,
@@ -252,6 +252,8 @@ void RealSensePolledCameraNode::processColorFrame(rs2::video_frame frameA, built
 
     getIntrinsics(infoMsg, RS2_STREAM_COLOR);
     sensor_msgs::msg::Image::SharedPtr msg = cv_bridge::CvImage(header, "bgr8", colorImage).toImageMsg();
+    
+    infoMsg.header = header;
 
     m_colorImagePublisher.publish(msg);
     m_colorImageInfoPubPtr->publish(infoMsg);
@@ -297,7 +299,12 @@ void RealSensePolledCameraNode::getIntrinsics(sensor_msgs::msg::CameraInfo& info
     infoA.k[2] = camInfo.ppx;
     infoA.k[4] = camInfo.fy;
     infoA.k[5] = camInfo.ppy;
-    infoA.k[5] = 1.0;
+    infoA.k[8] = 1.0;
+    infoA.p[0] = camInfo.fx;
+    infoA.p[2] = camInfo.ppx;
+    infoA.p[5] = camInfo.fy;
+    infoA.p[6] = camInfo.ppy;
+    infoA.p[10] = 1.0;
     infoA.d.resize(5);
     for(int32_t idx = 0; idx < 5; ++idx)
     {
@@ -358,76 +365,76 @@ bool RealSensePolledCameraNode::getParamsFromStreamProfile(std::string profileSt
     return success;
 }
 
-void RealSensePolledCameraNode::publishTfFrames()
-{
-    std::vector<geometry_msgs::msg::TransformStamped> transforms;
-    // color_frame to color_optical_frame
-    geometry_msgs::msg::TransformStamped t;
+// void RealSensePolledCameraNode::publishTfFrames()
+// {
+//     std::vector<geometry_msgs::msg::TransformStamped> transforms;
+//     // color_frame to color_optical_frame
+//     geometry_msgs::msg::TransformStamped t;
 
-    // Set header information
-    t.header.stamp = this->get_clock()->now();
-    t.header.frame_id = m_cameraName + "_link"; // Parent frame
-    t.child_frame_id = m_cameraName + "_color_frame"; // Child frame
+//     // Set header information
+//     t.header.stamp = this->get_clock()->now();
+//     t.header.frame_id = m_cameraName + "_link"; // Parent frame
+//     t.child_frame_id = m_cameraName + "_color_frame"; // Child frame
 
-    // Set translation//0 ${d435_cam_depth_to_color_offset} 0
-    t.transform.translation.x = 0.0;
-    t.transform.translation.y = 0.015;
-    t.transform.translation.z = 0.0;
+//     // Set translation//0 ${d435_cam_depth_to_color_offset} 0
+//     t.transform.translation.x = 0.0;
+//     t.transform.translation.y = 0.015;
+//     t.transform.translation.z = 0.0;
 
-    t.transform.rotation.x = 0.0;
-    t.transform.rotation.y = 0.0;
-    t.transform.rotation.z = 0.0;
-    t.transform.rotation.w = 1.0;
-    transforms.push_back(t);
+//     t.transform.rotation.x = 0.0;
+//     t.transform.rotation.y = 0.0;
+//     t.transform.rotation.z = 0.0;
+//     t.transform.rotation.w = 1.0;
+//     transforms.push_back(t);
 
-    // Set header information
-    t.header.stamp = this->get_clock()->now();
-    t.header.frame_id = m_cameraName + "_color_frame"; // Parent frame
-    t.child_frame_id = m_cameraName + "_color_optical_frame"; // Child frame
+//     // Set header information
+//     t.header.stamp = this->get_clock()->now();
+//     t.header.frame_id = m_cameraName + "_color_frame"; // Parent frame
+//     t.child_frame_id = m_cameraName + "_color_optical_frame"; // Child frame
 
-    // Set translation (example: 1m in x, 0m in y, 0.5m in z)
-    t.transform.translation.x = 0.0;
-    t.transform.translation.y = 0.0;
-    t.transform.translation.z = 0.0;
+//     // Set translation (example: 1m in x, 0m in y, 0.5m in z)
+//     t.transform.translation.x = 0.0;
+//     t.transform.translation.y = 0.0;
+//     t.transform.translation.z = 0.0;
 
-    t.transform.rotation.x = -0.5;
-    t.transform.rotation.y =  0.5;
-    t.transform.rotation.z = -0.5;
-    t.transform.rotation.w =  0.5;
-    transforms.push_back(t);
+//     t.transform.rotation.x = -0.5;
+//     t.transform.rotation.y =  0.5;
+//     t.transform.rotation.z = -0.5;
+//     t.transform.rotation.w =  0.5;
+//     transforms.push_back(t);
 
 
-    // Set header information
-    t.header.stamp = this->get_clock()->now();
-    t.header.frame_id = m_cameraName + "_link"; // Parent frame
-    t.child_frame_id = m_cameraName + "_depth_frame"; // Child frame
+//     // Set header information
+//     t.header.stamp = this->get_clock()->now();
+//     t.header.frame_id = m_cameraName + "_link"; // Parent frame
+//     t.child_frame_id = m_cameraName + "_depth_frame"; // Child frame
 
-    // Set translation (example: 1m in x, 0m in y, 0.5m in z)
-    t.transform.translation.x = 0.0;
-    t.transform.translation.y = 0.0;
-    t.transform.translation.z = 0.0;
+//     // Set translation (example: 1m in x, 0m in y, 0.5m in z)
+//     t.transform.translation.x = 0.0;
+//     t.transform.translation.y = 0.0;
+//     t.transform.translation.z = 0.0;
 
-    t.transform.rotation.x = 0.0;
-    t.transform.rotation.y = 0.0;
-    t.transform.rotation.z = 0.0;
-    t.transform.rotation.w = 1.0;
-    transforms.push_back(t);
+//     t.transform.rotation.x = 0.0;
+//     t.transform.rotation.y = 0.0;
+//     t.transform.rotation.z = 0.0;
+//     t.transform.rotation.w = 1.0;
+//     transforms.push_back(t);
 
-    // Set header information
-    t.header.stamp = this->get_clock()->now();
-    t.header.frame_id = m_cameraName + "_depth_frame"; // Parent frame
-    t.child_frame_id = m_cameraName + "_depth_optical_frame"; // Child frame
+//     // Set header information
+//     t.header.stamp = this->get_clock()->now();
+//     t.header.frame_id = m_cameraName + "_depth_frame"; // Parent frame
+//     t.child_frame_id = m_cameraName + "_depth_optical_frame"; // Child frame
 
-    // Set translation (example: 1m in x, 0m in y, 0.5m in z)
-    t.transform.translation.x = 0.0;
-    t.transform.translation.y = 0.0;
-    t.transform.translation.z = 0.0;
+//     // Set translation (example: 1m in x, 0m in y, 0.5m in z)
+//     t.transform.translation.x = 0.0;
+//     t.transform.translation.y = 0.0;
+//     t.transform.translation.z = 0.0;
 
-    t.transform.rotation.x = -0.5;
-    t.transform.rotation.y =  0.5;
-    t.transform.rotation.z = -0.5;
-    t.transform.rotation.w =  0.5;
-    transforms.push_back(t);
+//     t.transform.rotation.x = -0.5;
+//     t.transform.rotation.y =  0.5;
+//     t.transform.rotation.z = -0.5;
+//     t.transform.rotation.w =  0.5;
+//     transforms.push_back(t);
 
-    m_staticTfBroadcaster->sendTransform(transforms);
-}
+//     m_staticTfBroadcaster->sendTransform(transforms);
+// }

@@ -15,7 +15,7 @@ def generate_launch_description():
             "camera_name": "left_wrist_mounted_camera",
             "camera_namespace": "",
 #            "serial_no": "'207522074907'",
-            "serial_no": "'207522074907'",
+            "serial_no": "'207522078043'",
             "rgb_camera.color_profile": "1280,720,6",
             # "depth_module.depth_profile": "320,180,6",
             # "depth_module.infra_profile": "320,180,6",
@@ -29,7 +29,7 @@ def generate_launch_description():
 
     right_camera = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory("realsense_polled_camera"), "launch", "rs_launch.py")
+            os.path.join(get_package_share_directory("realsense_polled_camera"), "launch", "rspc.launch.py")
         ),
         launch_arguments={
             "camera_name": "right_wrist_mounted_camera",
@@ -46,6 +46,6 @@ def generate_launch_description():
         }.items(),
     )
 
-#    return LaunchDescription([left_camera, right_camera])
-    return LaunchDescription([left_camera])
+    return LaunchDescription([left_camera, right_camera])
+    # return LaunchDescription([left_camera])
     # return LaunchDescription([right_camera])
