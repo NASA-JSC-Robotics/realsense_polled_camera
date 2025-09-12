@@ -39,7 +39,6 @@ void RealSensePolledCameraNode::initialize()
     m_enablePointCloud = get_parameter("pointcloud.enable").as_bool();
     m_alignDepthToColor = get_parameter("align_depth.enable").as_bool();
     m_colorFormat = get_parameter("rgb_camera.color_format").as_string();
-    m_willPublishTf = get_parameter("publish_tf").as_bool();
 
     RCLCPP_INFO(this->get_logger(), "PARAM: camera_name               %s",
                 get_parameter("camera_name").as_string().c_str());
@@ -53,6 +52,8 @@ void RealSensePolledCameraNode::initialize()
                 get_parameter("pointcloud.enable").as_bool() ? "true" : "false");
     RCLCPP_INFO(this->get_logger(), "PARAM: align_depth.enable        %s",
                 get_parameter("align_depth.enable").as_bool() ? "true" : "false");
+    RCLCPP_INFO(this->get_logger(), "PARAM: publish_tf                %s",
+                get_parameter("publish_tf").as_bool() ? "true" : "false");
 
     RCLCPP_INFO(this->get_logger(), "PARAM: rgb_camera.color_profile   %s",
                 get_parameter("rgb_camera.color_profile").as_string().c_str());
@@ -80,7 +81,7 @@ void RealSensePolledCameraNode::initialize()
         m_pointCloudPubPtr = this->create_publisher<sensor_msgs::msg::PointCloud2>("~/pointcloud", 1);
     }
 
-    if(m_willPublishTf)
+    if(get_parameter("publish_tf").as_bool())
     {
         m_staticTfBroadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
     }
@@ -156,6 +157,11 @@ void RealSensePolledCameraNode::initializeCamera()
     if(get_parameter("align_depth.enable").as_bool())
     {
         m_alignPtr = std::make_shared<rs2::align>(RS2_STREAM_COLOR);
+    }
+
+    if(get_parameter("publish_tf").as_bool())
+    {
+        publishTfFrames();
     }
 }
 
@@ -354,5 +360,74 @@ bool RealSensePolledCameraNode::getParamsFromStreamProfile(std::string profileSt
 
 void RealSensePolledCameraNode::publishTfFrames()
 {
-    
+    std::vector<geometry_msgs::msg::TransformStamped> transforms;
+    // color_frame to color_optical_frame
+    geometry_msgs::msg::TransformStamped t;
+
+    // Set header information
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = m_cameraName + "_link"; // Parent frame
+    t.child_frame_id = m_cameraName + "_color_frame"; // Child frame
+
+    // Set translation//0 ${d435_cam_depth_to_color_offset} 0
+    t.transform.translation.x = 0.0;
+    t.transform.translation.y = 0.015;
+    t.transform.translation.z = 0.0;
+
+    t.transform.rotation.x = 0.0;
+    t.transform.rotation.y = 0.0;
+    t.transform.rotation.z = 0.0;
+    t.transform.rotation.w = 1.0;
+    transforms.push_back(t);
+
+    // Set header information
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = m_cameraName + "_color_frame"; // Parent frame
+    t.child_frame_id = m_cameraName + "_color_optical_frame"; // Child frame
+
+    // Set translation (example: 1m in x, 0m in y, 0.5m in z)
+    t.transform.translation.x = 0.0;
+    t.transform.translation.y = 0.0;
+    t.transform.translation.z = 0.0;
+
+    t.transform.rotation.x = -0.5;
+    t.transform.rotation.y =  0.5;
+    t.transform.rotation.z = -0.5;
+    t.transform.rotation.w =  0.5;
+    transforms.push_back(t);
+
+
+    // Set header information
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = m_cameraName + "_link"; // Parent frame
+    t.child_frame_id = m_cameraName + "_depth_frame"; // Child frame
+
+    // Set translation (example: 1m in x, 0m in y, 0.5m in z)
+    t.transform.translation.x = 0.0;
+    t.transform.translation.y = 0.0;
+    t.transform.translation.z = 0.0;
+
+    t.transform.rotation.x = 0.0;
+    t.transform.rotation.y = 0.0;
+    t.transform.rotation.z = 0.0;
+    t.transform.rotation.w = 1.0;
+    transforms.push_back(t);
+
+    // Set header information
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = m_cameraName + "_depth_frame"; // Parent frame
+    t.child_frame_id = m_cameraName + "_depth_optical_frame"; // Child frame
+
+    // Set translation (example: 1m in x, 0m in y, 0.5m in z)
+    t.transform.translation.x = 0.0;
+    t.transform.translation.y = 0.0;
+    t.transform.translation.z = 0.0;
+
+    t.transform.rotation.x = -0.5;
+    t.transform.rotation.y =  0.5;
+    t.transform.rotation.z = -0.5;
+    t.transform.rotation.w =  0.5;
+    transforms.push_back(t);
+
+    m_staticTfBroadcaster->sendTransform(transforms);
 }

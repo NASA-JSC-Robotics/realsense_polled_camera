@@ -173,9 +173,10 @@ def launch_setup(context):
                 name=camera_name,
                 parameters=[params_from_file, 
                             {'camera_name': camera_name},
-                            {"serial_no": '207522074907'},
-                            {'enable_depth': False}],
-                extra_arguments=[{'use_intra_process_comms':True}]),
+                            {'serial_no': '207522074907'},
+                            {'enable_depth': False},
+                            {'publish_tf': True}],
+#                extra_arguments=[{'use_intra_process_comms':True}]),  -- not yet supported
         ],
         output=output
     )

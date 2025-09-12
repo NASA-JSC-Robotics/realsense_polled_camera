@@ -60,7 +60,6 @@ class RealSensePolledCameraNode : public rclcpp::Node
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr m_pointCloudPubPtr;
     rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr m_triggerServer;
 
-    bool m_willPublishTf;
     std::shared_ptr<tf2_ros::StaticTransformBroadcaster> m_staticTfBroadcaster;
     
 

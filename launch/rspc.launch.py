@@ -15,10 +15,16 @@
 """Launch realsense_polled_camera node."""
 import os
 import yaml
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-import launch_ros.actions
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, LogInfo
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, Command
+from launch_ros.actions import Node
+
+launch_args = [
+    DeclareLaunchArgument(name="camera_model", default_value="d435i", description="realsense camera model"),
+    DeclareLaunchArgument(name="publish_tf", default_value='false', description="if true, launch file runs a joint state publisher for the cameras"),
+]
 
 configurable_parameters = [{'name': 'camera_name',                  'default': 'camera', 'description': 'camera unique name'},
                            {'name': 'camera_namespace',             'default': 'camera', 'description': 'namespace for camera'},
@@ -101,19 +107,19 @@ def set_configurable_parameters(parameters):
 def yaml_to_dict(path_to_yaml):
     with open(path_to_yaml, "r") as f:
         return yaml.load(f, Loader=yaml.SafeLoader)
+    
 
 def launch_setup(context, params, param_name_suffix=''):
     _config_file = LaunchConfiguration('config_file' + param_name_suffix).perform(context)
+    camera_model = LaunchConfiguration('camera_model' + param_name_suffix).perform(context)
+    camera_name = LaunchConfiguration('camera_name' + param_name_suffix).perform(context)
     params_from_file = {} if _config_file == "''" else yaml_to_dict(_config_file)
 
     _output = LaunchConfiguration('output' + param_name_suffix)
-    
-    # Dynamically choose Node or LifecycleNode
-    node_action = launch_ros.actions.Node
 
 
     return [
-        node_action(
+        Node(
             package='realsense_polled_camera',
             namespace=LaunchConfiguration('camera_namespace' + param_name_suffix),
             name=LaunchConfiguration('camera_name' + param_name_suffix),
@@ -122,10 +128,17 @@ def launch_setup(context, params, param_name_suffix=''):
             output=_output,
             arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level' + param_name_suffix)],
             emulate_tty=True,
-            )
+            ),
     ]
 
+
 def generate_launch_description():
-    return LaunchDescription(declare_configurable_parameters(configurable_parameters) + [
-        OpaqueFunction(function=launch_setup, kwargs = {'params' : set_configurable_parameters(configurable_parameters)})
-    ])
+    opfunc = OpaqueFunction(function=launch_setup, kwargs = {'params' : set_configurable_parameters(configurable_parameters)})
+    ld = LaunchDescription(launch_args + declare_configurable_parameters(configurable_parameters))
+    ld.add_action(opfunc)
+    return ld
+
+
+#    return LaunchDescription(declare_configurable_parameters(configurable_parameters) + launch_args + [
+#        OpaqueFunction(function=launch_setup, kwargs = {'params' : set_configurable_parameters(configurable_parameters)})
+#    ])

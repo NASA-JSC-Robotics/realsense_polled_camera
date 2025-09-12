@@ -23,6 +23,7 @@ def generate_launch_description():
             "pointcloud.enable": "false",
             "align_depth.enable": "false",
             "enable_depth": "false",
+            "publish_tf": "true",
         }.items(),
     )
 
@@ -41,6 +42,7 @@ def generate_launch_description():
             "pointcloud.enable": "false",
             "align_depth.enable": "false",
             "enable_depth": "false",
+            "publish_tf": "true",
         }.items(),
     )
 
