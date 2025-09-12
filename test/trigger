@@ -1,0 +1,6 @@
+#! /bin/bash
+
+camera_name="${1:-camera}"
+
+echo ' ros2 service call $camera_name/request_images std_srvs/srv/Trigger '
+ros2 service call /$camera_name/request_images std_srvs/srv/Trigger
