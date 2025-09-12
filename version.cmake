@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 3.8)
+
+execute_process(
+  COMMAND git rev-parse --abbrev-ref HEAD
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_BRANCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Get the latest abbreviated commit hash of the working branch
+execute_process(
+  COMMAND git log -1 --format=%h
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_COMMIT_HASH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Get the closest tag
+execute_process(
+  COMMAND git describe --tags --dirty
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_DESCRIBE_VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/VERSION "PACKAGE: ${PROJECT_NAME}\n")
+file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/VERSION "\tversion: ${GIT_DESCRIBE_VERSION}\n")
+file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/VERSION "\tbranch: ${GIT_BRANCH}\n")
+file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/VERSION "\thash: ${GIT_COMMIT_HASH}\n")
+
+
+
