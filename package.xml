@@ -3,9 +3,9 @@
 <package format="3">
   <name>realsense_polled_camera</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>RealSense camera ros 2 node that only provides images on service requests.</description>
   <maintainer email="jodi.s.graf@nasa.gov">jsgraf</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache License, Version 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
