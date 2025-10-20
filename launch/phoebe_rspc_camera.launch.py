@@ -67,5 +67,3 @@ def generate_launch_description():
     )
 
     return LaunchDescription([left_camera, right_camera])
-    # return LaunchDescription([left_camera])
-    # return LaunchDescription([right_camera])
