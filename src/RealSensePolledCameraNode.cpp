@@ -84,20 +84,26 @@ void RealSensePolledCameraNode::initialize()
   m_infra1Framename = m_cameraName + "infra1_optical_frame";
   m_infra2Framename = m_cameraName + "infra2_optical_frame";
 
+  // Sensor data defaults to best effort QoS settings. But as our publishers are on demand we should
+  // guarantee that the messages arrive.
+  auto reliable_qos = rmw_qos_profile_sensor_data;
+  reliable_qos.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+  reliable_qos.depth = 10;
+  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(reliable_qos), reliable_qos);
+
   if (m_enableColorImage)
   {
-    m_colorImagePublisher = image_transport::create_publisher(this, "~/color/image_raw");
-    m_colorImageInfoPubPtr = this->create_publisher<sensor_msgs::msg::CameraInfo>("~/color/camera_info", 1);
+    m_colorImagePublisher = image_transport::create_publisher(this, "~/color/image_raw", reliable_qos);
+    m_colorImageInfoPubPtr = this->create_publisher<sensor_msgs::msg::CameraInfo>("~/color/camera_info", qos);
   }
   if (m_enableDepthImage)
   {
-    m_depthImagePublisher = image_transport::create_publisher(this, "~/depth/image_raw");
-    m_depthImageInfoPubPtr = this->create_publisher<sensor_msgs::msg::CameraInfo>("~/depth/camera_info", 1);
+    m_depthImagePublisher = image_transport::create_publisher(this, "~/depth/image_raw", reliable_qos);
+    m_depthImageInfoPubPtr = this->create_publisher<sensor_msgs::msg::CameraInfo>("~/depth/camera_info", qos);
   }
-
   if (m_enablePointCloud)
   {
-    m_pointCloudPubPtr = this->create_publisher<sensor_msgs::msg::PointCloud2>("~/pointcloud", 1);
+    m_pointCloudPubPtr = this->create_publisher<sensor_msgs::msg::PointCloud2>("~/pointcloud", qos);
   }
 
   // if(get_parameter("publish_tf").as_bool())
