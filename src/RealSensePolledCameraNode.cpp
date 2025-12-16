@@ -113,9 +113,11 @@ void RealSensePolledCameraNode::initializeCamera()
 {
   rs2::context ctx;
   rs2::device_list devices = ctx.query_devices();
+  std::string selected_serial;
   if (m_serialNumber.empty())
   {
     m_device = devices.front();
+    selected_serial = m_device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
   }
   else
   {
@@ -127,6 +129,8 @@ void RealSensePolledCameraNode::initializeCamera()
       if (sn == m_serialNumber)
       {
         m_device = dev;
+        selected_serial = sn;
+        break;
       }
     }
   }
@@ -134,7 +138,8 @@ void RealSensePolledCameraNode::initializeCamera()
   {
     RCLCPP_FATAL(this->get_logger(), "Camera with serial number %s not found", m_serialNumber.c_str());
   }
-  m_pipe.set_device(&m_device);
+  m_rsConfig.enable_device(selected_serial);
+
   if (get_parameter("enable_color").as_bool())
   {
     std::string colorStreamFormat = get_parameter("rgb_camera.color_profile").as_string();
