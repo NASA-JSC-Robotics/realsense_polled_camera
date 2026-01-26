@@ -56,7 +56,8 @@ def generate_launch_description():
 ```
 ## Citation
 
-This project falls under the purview of the iMETRO project. If you use this in your own work, please cite the following paper:
+This project falls under the purview of the iMETRO project.
+If you use this in your own work, please cite the following paper:
 
 ```bibtex
 @INPROCEEDINGS{imetro-facility-2025,
