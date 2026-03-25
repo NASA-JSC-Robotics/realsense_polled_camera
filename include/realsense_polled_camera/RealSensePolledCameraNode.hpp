@@ -23,8 +23,8 @@
 #include <rclcpp_components/register_node_macro.hpp>
 #include <thread>
 
-#include <cv_bridge/cv_bridge.h>
-#include <image_geometry/pinhole_camera_model.h>
+#include <cv_bridge/cv_bridge.hpp>
+#include <image_geometry/pinhole_camera_model.hpp>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <image_transport/image_transport.hpp>
