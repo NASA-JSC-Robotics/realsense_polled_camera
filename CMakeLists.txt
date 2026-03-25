@@ -19,6 +19,15 @@ find_package(image_transport REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_geometry REQUIRED)
+find_package(MPI REQUIRED)
+if(NOT TARGET MPI::MPI_C)
+  add_library(MPI::MPI_C INTERFACE IMPORTED)
+  set_target_properties(MPI::MPI_C PROPERTIES
+    INTERFACE_COMPILE_OPTIONS "${MPI_C_COMPILE_FLAGS}"
+    INTERFACE_INCLUDE_DIRECTORIES "${MPI_C_INCLUDE_PATH}"
+    INTERFACE_LINK_LIBRARIES "${MPI_C_LIBRARIES}"
+  )
+endif()
 find_package(pcl_ros REQUIRED)
 find_package(pcl_conversions REQUIRED)
 # find_package(tf2_ros REQUIRED)
