@@ -19,35 +19,30 @@
 
 #pragma once
 
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp_components/register_node_macro.hpp>
 #include <thread>
 
-#include <cv_bridge/cv_bridge.hpp>
-#include <image_geometry/pinhole_camera_model.hpp>
-
 #include <pcl_conversions/pcl_conversions.h>
+#include <librealsense2/rs.hpp>
 
-// Use different headers depending on Humble or later.
-#ifdef CV_BRIDGE_HUMBLE
-#include <cv_bridge/cv_bridge.h>
-#include <image_geometry/pinhole_camera_model.h>
-#include <image_transport/image_transport.h>
-#else
-#include <cv_bridge/cv_bridge.hpp>
-#include <image_geometry/pinhole_camera_model.hpp>
 #include <image_transport/image_transport.hpp>
-#endif
-
-// #include <tf2_ros/static_transform_broadcaster.hpp>
-#include <tf2/LinearMath/Quaternion.h>
-
-#include <sensor_msgs/msg/image.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
+#include <sensor_msgs/msg/image.h>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <std_srvs/srv/trigger.hpp>
 
-#include <librealsense2/rs.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
+
+#include <tf2/LinearMath/Quaternion.h>
+
+// Use different headers for cv_bridge depending on Humble or later.
+#ifdef CV_BRIDGE_HUMBLE
+#include <cv_bridge/cv_bridge.h>
+#include <image_geometry/pinhole_camera_model.h>
+#else
+#include <cv_bridge/cv_bridge.hpp>
+#include <image_geometry/pinhole_camera_model.hpp>
+#endif
 
 class RealSensePolledCameraNode : public rclcpp::Node
 {
