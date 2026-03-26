@@ -27,8 +27,17 @@
 #include <image_geometry/pinhole_camera_model.hpp>
 
 #include <pcl_conversions/pcl_conversions.h>
+
+// Use different headers depending on Humble or later.
+#ifdef CV_BRIDGE_HUMBLE
+#include <cv_bridge/cv_bridge.h>
+#include <image_geometry/pinhole_camera_model.h>
+#include <image_transport/image_transport.h>
+#else
+#include <cv_bridge/cv_bridge.hpp>
+#include <image_geometry/pinhole_camera_model.hpp>
 #include <image_transport/image_transport.hpp>
-#include <opencv2/opencv.hpp>
+#endif
 
 // #include <tf2_ros/static_transform_broadcaster.hpp>
 #include <tf2/LinearMath/Quaternion.h>
